@@ -17,6 +17,9 @@ const MosipMobileidSdk = NativeModules.MosipMobileidSdk
       }
     );
 
-export function multiply(a: number, b: number): Promise<number> {
-  return MosipMobileidSdk.multiply(a, b);
+export function faceAuth(
+  capturedImage: string,
+  vcImage: string
+): Promise<boolean> {
+  return MosipMobileidSdk.faceAuth(capturedImage, vcImage);
 }
