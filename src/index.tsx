@@ -17,11 +17,11 @@ const MosipMobileidSdk = NativeModules.MosipMobileidSdk
       }
     );
 
-export async function init(path: string): Promise<boolean> {
-  const config = {
+export async function init(path: string, livenessPath?: string): Promise<boolean> {
+  let config = {
     withFace: {
       encoder: {
-        faceNetModel: {
+        tfModel: {
           path: path,
           inputWidth: 160,
           inputHeight: 160,
@@ -35,6 +35,22 @@ export async function init(path: string): Promise<boolean> {
       },
     },
   };
+  if (livenessPath) {
+    let faceConfig = Object.assign(config.withFace, {
+      liveness: {
+        tfModel: {
+          path: livenessPath,
+          inputWidth: 224,
+          inputHeight: 224,
+          // 0.0 - real, 1.0 - spoof
+          threshold: 0.5,
+          // optional
+          // modelChecksum: "797b4d99794965749635352d55da38d4748c28c659ee1502338badee4614ed06",
+        }
+      }
+    });
+    config = Object.assign(config, {...config, withFace: faceConfig});
+  }
   try {
     console.log(`init with: ${JSON.stringify(config)}`)
     await MosipMobileidSdk.configure(config);
@@ -62,6 +78,24 @@ export async function faceScore(capturedImage: string, vcImage: string): Promise
     return await MosipMobileidSdk.faceScore(template1, template2);
   } catch (e) {
     console.error('faceScore auth failed', e);
+    return -1.0;
+  }
+}
+
+export async function livenessValidate(capturedImage: string): Promise<boolean> {
+  try {
+    return !(await MosipMobileidSdk.livenessValidate(capturedImage));
+  } catch (e) {
+    console.error('livenessScore validate failed', e);
+    return false;
+  }
+}
+
+export async function livenessScore(capturedImage: string): Promise<number> {
+  try {
+    return await MosipMobileidSdk.livenessScore(capturedImage);
+  } catch (e) {
+    console.error('livenessScore  failed', e);
     return -1.0;
   }
 }

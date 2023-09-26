@@ -5,10 +5,7 @@ import android.util.Base64
 import com.facebook.react.bridge.*
 import net.iriscan.sdk.BiometricSdkFactory
 import net.iriscan.sdk.core.io.HashMethod
-import net.iriscan.sdk.face.FaceEncodeProperties
-import net.iriscan.sdk.face.FaceExtractProperties
-import net.iriscan.sdk.face.FaceMatchProperties
-import net.iriscan.sdk.face.FaceNetModelConfiguration
+import net.iriscan.sdk.face.*
 
 class MosipMobileidSdkModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
@@ -22,24 +19,42 @@ class MosipMobileidSdkModule(reactContext: ReactApplicationContext) :
     var configBuilder = BiometricSdkFactory.configBuilder()
       .withContext(reactApplicationContext)
     if (config.hasKey("withFace")) {
-      val encoderFaceNetConfig = config.getMap("withFace")!!.getMap("encoder")!!.getMap("faceNetModel")!!
+      val encoderFaceNetConfig = config.getMap("withFace")!!.getMap("encoder")!!.getMap("tfModel")!!
       val matcherConfig = config.getMap("withFace")!!.getMap("matcher")!!
       val modelChecksum = encoderFaceNetConfig.getString("modelChecksum")
+      val encoderProperties = FaceEncodeProperties(
+        tfModel = FaceNetModelConfiguration(
+          path = encoderFaceNetConfig.getString("path")!!,
+          inputHeight = encoderFaceNetConfig.getInt("inputHeight"),
+          inputWidth = encoderFaceNetConfig.getInt("inputWidth"),
+          outputLength = encoderFaceNetConfig.getInt("outputLength"),
+          modelChecksum = modelChecksum,
+          modelChecksumMethod = if (modelChecksum != null) HashMethod.SHA256 else null,
+          overrideCacheOnWrongChecksum = true
+        )
+      )
+      var livenessPriperties: FaceLivenessDetectionProperties? = null
+      val livenessConfig = config.getMap("withFace")!!.getMap("liveness")?.getMap("tfModel")
+      if (livenessConfig != null) {
+        val livenessModelChecksum = livenessConfig.getString("modelChecksum")
+        livenessPriperties = FaceLivenessDetectionProperties(
+          tfModel = LivenessModelConfiguration(
+            path = livenessConfig.getString("path")!!,
+            inputHeight = livenessConfig.getInt("inputHeight"),
+            inputWidth = livenessConfig.getInt("inputWidth"),
+            threshold = livenessConfig.getDouble("threshold"),
+            modelChecksum = livenessModelChecksum,
+            modelChecksumMethod = if (livenessModelChecksum != null) HashMethod.SHA256 else null,
+            overrideCacheOnWrongChecksum = true
+          )
+        )
+      }
       configBuilder = configBuilder
         .withFace(
           extractor = FaceExtractProperties(),
-          encoder = FaceEncodeProperties(
-            faceNetModel = FaceNetModelConfiguration(
-              path = encoderFaceNetConfig.getString("path")!!,
-              inputHeight = encoderFaceNetConfig.getInt("inputHeight"),
-              inputWidth = encoderFaceNetConfig.getInt("inputWidth"),
-              outputLength = encoderFaceNetConfig.getInt("outputLength"),
-              modelChecksum = modelChecksum,
-              modelChecksumMethod = if (modelChecksum != null) HashMethod.SHA256 else null,
-              overrideCacheOnWrongChecksum = true
-            )
-          ),
-          matcher = FaceMatchProperties(threshold = matcherConfig.getDouble("threshold"))
+          encoder = encoderProperties,
+          matcher = FaceMatchProperties(threshold = matcherConfig.getDouble("threshold")),
+          liveness = livenessPriperties
         )
     }
     try {
@@ -79,6 +94,24 @@ class MosipMobileidSdkModule(reactContext: ReactApplicationContext) :
     val template1 = Base64.decode(b64Template1, Base64.DEFAULT)
     val template2 = Base64.decode(b64Template2, Base64.DEFAULT)
     val score = instance.face().matcher().matchScore(template1, template2)
+    promise.resolve(score)
+  }
+
+  @ReactMethod
+  fun livenessValidate(b64Img: String, promise: Promise) {
+    val instance = BiometricSdkFactory.getInstance()!!
+    val imageData = Base64.decode(b64Img, Base64.DEFAULT)
+    val bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
+    val result = instance.face().liveness().validate(bitmap)
+    promise.resolve(result)
+  }
+
+  @ReactMethod
+  fun livenessScore(b64Img: String, promise: Promise) {
+    val instance = BiometricSdkFactory.getInstance()!!
+    val imageData = Base64.decode(b64Img, Base64.DEFAULT)
+    val bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
+    val score = instance.face().liveness().score(bitmap)
     promise.resolve(score)
   }
 

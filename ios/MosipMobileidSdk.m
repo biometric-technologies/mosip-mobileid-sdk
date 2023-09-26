@@ -24,6 +24,17 @@ RCT_EXTERN_METHOD(faceScore:
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject);
 
+RCT_EXTERN_METHOD(livenessScore:
+                  (NSString*)b64Img
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject);
+
+RCT_EXTERN_METHOD(livenessValidate:
+                  (NSString*)b64Img
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject);
+
+
 + (BOOL)requiresMainQueueSetup
 {
   return NO;
