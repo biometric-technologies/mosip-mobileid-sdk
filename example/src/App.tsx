@@ -4,7 +4,7 @@ import {useEffect, useRef} from 'react';
 import {Camera, ImageType} from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 
-import {Button, Image, Platform, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Button, Image, Platform, ScrollView, Share, StyleSheet, Text, TextInput, View} from 'react-native';
 import RNFS from 'react-native-fs';
 
 export default function App() {
@@ -162,6 +162,25 @@ export default function App() {
         }
     }
 
+    const shareImage = async (id, text) => {
+      const path = RNFS.DocumentDirectoryPath + `/image${id}.txt`;
+      await RNFS.writeFile(path, text, 'utf8');
+      const shareOptions = {
+        url: 'file://' + path,
+
+      };
+      await  Share.share(shareOptions)
+      await RNFS.unlink(path);
+    }
+
+    const shareImage1 = () => {
+      shareImage(1, image1?.data)
+    }
+
+    const shareImage2 = () => {
+      shareImage(2, image2?.data)
+    }
+
     return (
         <ScrollView style={styles.container}>
             <Button title={'Toggle Camera Side'} onPress={toggleType}/>
@@ -208,6 +227,11 @@ export default function App() {
             <Text style={styles.text}>{result}</Text>
             <Text style={styles.text}>{liveness1}</Text>
             <Text style={styles.text}>{liveness2}</Text>
+            <View style={styles.vseparator}/>
+            <Button title={'Share image 1'} onPress={shareImage1}/>
+            <View style={styles.vseparator}/>
+            <Button title={'Share image 2'} onPress={shareImage2}/>
+            <View style={styles.vseparator}/>
             <View style={styles.vseparator}/>
         </ScrollView>
     );
