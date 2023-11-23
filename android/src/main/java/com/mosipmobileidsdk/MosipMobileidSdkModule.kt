@@ -102,7 +102,7 @@ class MosipMobileidSdkModule(reactContext: ReactApplicationContext) :
     val instance = BiometricSdkFactory.getInstance()!!
     val imageData = Base64.decode(b64Img, Base64.DEFAULT)
     val bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
-    val result = instance.face().liveness().validate(bitmap)
+    val result = instance.face().liveness().extractAndValidate(bitmap)
     promise.resolve(result)
   }
 
@@ -111,7 +111,7 @@ class MosipMobileidSdkModule(reactContext: ReactApplicationContext) :
     val instance = BiometricSdkFactory.getInstance()!!
     val imageData = Base64.decode(b64Img, Base64.DEFAULT)
     val bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
-    val score = instance.face().liveness().score(bitmap)
+    val score = instance.face().liveness().extractAndScore(bitmap)
     promise.resolve(score)
   }
 

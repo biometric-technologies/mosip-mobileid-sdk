@@ -108,7 +108,7 @@ class MosipMobileidSdk: NSObject {
         let img = UIImage(data: imageData)!
         let cgImagePtr = UnsafeMutableRawPointer(Unmanaged.passRetained(img.cgImage!).toOpaque())
         let instance = BiometricSdkFactory.shared.getInstance()!
-        resolve(instance.face().liveness().score(nativeImage: cgImagePtr))
+        resolve(instance.face().liveness().extractAndScore(nativeImage: cgImagePtr))
     }
     
     @objc
@@ -119,7 +119,7 @@ class MosipMobileidSdk: NSObject {
         let img = UIImage(data: imageData)!
         let cgImagePtr = UnsafeMutableRawPointer(Unmanaged.passRetained(img.cgImage!).toOpaque())
         let instance = BiometricSdkFactory.shared.getInstance()!
-        resolve(instance.face().liveness().validate(nativeImage: cgImagePtr))
+        resolve(instance.face().liveness().extractAndValidate(nativeImage: cgImagePtr))
     }
     
 }

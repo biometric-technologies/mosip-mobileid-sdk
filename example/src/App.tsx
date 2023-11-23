@@ -23,7 +23,7 @@ export default function App() {
     // load async
     useEffect(() => {
         init("https://github.com/biometric-technologies/tensorflow-facenet-model-test/raw/master/model.tflite",
-            "https://github.com/biometric-technologies/liveness-detection-model/releases/download/v0.1.0/model_15_100.tflite")
+            "https://github.com/biometric-technologies/liveness-detection-model/releases/download/v0.2.0/deePix.tflite")
             .catch(e => console.log(`Error: ${e}`))
             .then(res => {
                 console.log(`========> sdk ready to use?: ${res}`);
