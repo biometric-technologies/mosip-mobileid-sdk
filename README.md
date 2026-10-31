@@ -6,6 +6,6 @@ A fork of [mosip/mosip-mobileid-sdk](https://github.com/mosip/mosip-mobileid-sdk
 
 Iriscan used this fork while building the face match that Inji ships today. The `main` branch holds only the upstream placeholder README; the upstream code is on `develop`, and the `IriScanDev`, `IriScanLivenessDev` and `InjiFaceSdk` branches hold the integration work. The maintained result is a separate package, [biometric-sdk-react-native](https://github.com/biometric-technologies/biometric-sdk-react-native), which is what Inji uses now.
 
-Read how the integration works at https://www.iriscan.com/mosip and https://docs.iriscan.net/mosip.
+Read how the integration works at https://www.iriscan.com/mosip and https://docs.iriscan.com/mosip.
 
 License: not yet specified in this fork (no LICENSE file on `main`); the upstream repository is MIT-licensed.
